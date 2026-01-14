@@ -10,20 +10,34 @@
   </div>
   <div class="container">
       <button @click="start()">Start</button>
-    </div>
+  </div>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      nodes: []
+      nodes: [],
+      updateId: null 
     };
   },
   methods: {
     // Start the game
     start(){
+      if (this.updateId) {
+        clearInterval(this.updateId);
+        this.updateId = null;
+      }
+
       this.generate_nodes()
+      this.update_grid()
+    },
+
+    // Sets an interval for shifting the grid
+    update_grid(){
+      this.updateId = setInterval(() => {
+        this.shift_grid();
+      }, 2000);
     },
 
     // Generates a 10 x 11 grid of two combined uppercase letters and returns it
@@ -43,6 +57,19 @@ export default {
      return Array.from({ length }, () =>
       String.fromCharCode(Math.floor(Math.random() * 26) + 65)
       ).join('');
+    },
+
+
+    // Shifts all nodes to the right in the grid
+    shift_grid(){
+      for (let i = 0; i < 11; i++){
+        const last = this.nodes[i].pop()
+        if (i+1 === 11){
+          this.nodes[0].unshift(last)
+        } else {
+          this.nodes[i+1].unshift(last)
+        }
+      }
     }
   }
 }
