@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <button @click="start()">Start</button>
+  <div class="container">
+    <table>
+      <tbody>
+        <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
+          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex">{{ value }}</td>
+        </tr>
+    </tbody>
+    </table>
   </div>
-  <table>
-    <tbody>
-      <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
-        <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex">{{ value }}</td>
-      </tr>
-  </tbody>
-  </table>
+  <div class="container">
+      <button @click="start()">Start</button>
+    </div>
 </template>
 
 <script>
@@ -22,7 +24,6 @@ export default {
     // Start the game
     start(){
       this.generate_nodes()
-      this.display()
     },
 
     // Generates a 10 x 11 grid of two combined uppercase letters and returns it
@@ -30,7 +31,7 @@ export default {
       this.nodes = [];
       for (let i = 0; i < 11; i++){
         let row = [];
-        for (let j = 0; j < 10; j++){
+        for (let j = 0; j < 12; j++){
           row.push(this.generate_random_letter())
         }
         this.nodes.push(row)
@@ -46,3 +47,18 @@ export default {
   }
 }
 </script>
+<style>
+  .container {
+    display: flex;
+    justify-content: center;
+  }
+
+  tr td {
+    font-family: monospace;
+    font-size: xx-large;
+    padding: 0.5rem;
+  }
+  table {
+    background-color: rgb(150, 150, 150);
+  }
+</style>
