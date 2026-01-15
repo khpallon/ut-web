@@ -6,7 +6,7 @@
     <table>
       <tbody>
         <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
-          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)" @keydown="move_player(pressed)">{{ value }}</td>
+          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)"  @keydown="move_player(pressed)">{{ value }}</td>
         </tr>
     </tbody>
     </table>
@@ -23,7 +23,8 @@ export default {
       nodes: [],
       answer: [],
       updateId: null,
-      player: [[5, 4], [5, 5], [5, 6], [5, 7]] // player coordinates
+      player: [[5, 4], [5, 5], [5, 6], [5, 7]], // player coordinates
+      listening: false
     };
   },
   methods: {
@@ -37,6 +38,7 @@ export default {
       this.generate_answer()
       this.player_location()
       window.addEventListener('keydown', this.move_player);
+      this.listening
       this.update_grid()
     },
 
@@ -112,6 +114,29 @@ export default {
         }
       }
 
+      if (pressed.key === "Enter"){
+        clearInterval(this.updateId);
+        this.updateId = null;
+
+        this.end_game()
+      }
+
+    },
+
+    end_game(){
+
+      this.listening = false;
+      for (let i = 0; i < this.player.length; i++){
+          if (this.nodes[this.player[i][0]][this.player[i][1]] !== this.answer[i]){
+            console.log('lost')
+            return
+          }
+
+      }
+
+      console.log('win!')
+
+
     },
 
     // Sets an interval for shifting the grid
@@ -133,6 +158,8 @@ export default {
       }
     },
 
+
+    // Generates a random answer from nodes array
     generate_answer(){
       this.answer = [];
 
