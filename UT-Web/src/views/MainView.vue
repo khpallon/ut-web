@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <h2 v-for="node in answer">{{ node }}</h2>
+  </div>
+  <div class="container">
     <table>
       <tbody>
         <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
@@ -18,6 +21,7 @@ export default {
   data() {
     return {
       nodes: [],
+      answer: [],
       updateId: null,
       player: [[5, 4], [5, 5], [5, 6], [5, 7]] // player coordinates
     };
@@ -30,6 +34,7 @@ export default {
         this.updateId = null;
       }
       this.generate_nodes()
+      this.generate_answer()
       this.player_location()
       window.addEventListener('keydown', this.move_player);
       this.update_grid()
@@ -52,7 +57,6 @@ export default {
 
       }
     },
-
 
     // Player movement in the grid
     move_player(pressed){
@@ -129,6 +133,26 @@ export default {
       }
     },
 
+    generate_answer(){
+      this.answer = [];
+
+      let row = Math.floor(Math.random() * 11);
+      let col = Math.floor(Math.random() * 12);
+
+      for (let i = 0; i < 4; i++){
+        this.answer.push(this.nodes[row][col])
+
+        if (col === 11 && row === 10){
+          col, row = 0
+        } else if (col === 11){
+          col = 0
+          row++
+        } else {
+          col++
+        }
+      }
+    },
+
     // Generates a random uppercase letter and returns it
     generate_random_letter(length = 2){ // COMPONENT
      return Array.from({ length }, () =>
@@ -152,12 +176,13 @@ export default {
 }
 </script>
 <style scoped>
+
   .container {
     display: flex;
     justify-content: center;
   }
 
-  tr td {
+  tr td, h2 {
     font-family: monospace;
     font-size: xx-large;
     padding: 0.5rem;
