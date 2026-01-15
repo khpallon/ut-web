@@ -3,7 +3,7 @@
     <table>
       <tbody>
         <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
-          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)">{{ value }}</td>
+          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)" @keydown="move_player(pressed)">{{ value }}</td>
         </tr>
     </tbody>
     </table>
@@ -31,20 +31,82 @@ export default {
       }
       this.generate_nodes()
       this.player_location()
+      window.addEventListener('keydown', this.move_player);
       this.update_grid()
     },
 
-    player_location(element, row, col){
-      console.log([row, col])
 
+    // Sets the player location visually in the grid
+    player_location(element, row, col){
+
+      if (element === undefined){
+          return
+      }
+
+      element.className = ''
+      
       for (let i = 0; i < this.player.length; i++){
         if (this.player[i][0] === row && this.player[i][1] === col){
           element.classList.add('player')
         }
+
       }
     },
 
-    move_player(){
+
+    // Player movement in the grid
+    move_player(pressed){
+      
+      if (pressed.key === "ArrowUp") {
+        for (let i = 0; i < this.player.length; i++){
+          if (this.player[i][0] === 0){
+            this.player[i][0] = 10
+          } else {
+            this.player[i][0]-- 
+          }
+        }
+      }
+
+      if (pressed.key === "ArrowDown") {
+        for (let i = 0; i < this.player.length; i++){
+          if (this.player[i][0] === 10){
+            this.player[i][0] = 0
+          } else {
+            this.player[i][0]++ 
+          }
+        }
+      }
+
+      if (pressed.key === "ArrowRight") {
+        for (let i = 0; i < this.player.length; i++){
+
+          if (this.player[i][1] === 11 && this.player[i][0] === 10){
+            this.player[i][0] = 0
+            this.player[i][1] = 0
+          } else if (this.player[i][1] === 11){
+            this.player[i][0]++
+            this.player[i][1] = 0
+          } else {
+            this.player[i][1]++ 
+          }
+            
+        }
+      }
+
+      if (pressed.key === "ArrowLeft") {
+        for (let i = 0; i < this.player.length; i++){
+          if (this.player[i][1] === 0 && this.player[i][0] === 0){
+            this.player[i][0] = 10
+            this.player[i][1] = 11
+          } else if (this.player[i][1] === 0){
+            this.player[i][0]--
+            this.player[i][1] = 11
+          } else {
+            this.player[i][1]-- 
+          }
+            
+        }
+      }
 
     },
 
@@ -52,7 +114,6 @@ export default {
     update_grid(){
       this.updateId = setInterval(() => {
         this.shift_grid();
-        this.update_player_location();
       }, 2000);
     },
 
