@@ -2,17 +2,20 @@
   <div class="container">
     <h2 v-for="node in answer">{{ node }}</h2>
   </div>
-  <div class="container">
+  <div class="container ontop">
     <table>
       <tbody>
         <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
-          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)"  @keydown="move_player(pressed)">{{ value }}</td>
+          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)">{{ value }}</td>
         </tr>
     </tbody>
     </table>
+    <!-- <div class="pause" v-if="end">
+      <h1>noku</h1>
+    </div> -->
   </div>
   <div class="container">
-      <button @click="start()">Start</button>
+      <button @click="start()" @keydown.enter.prevent>Start</button>
   </div>
 </template>
 
@@ -22,9 +25,10 @@ export default {
     return {
       nodes: [],
       answer: [],
+      answer_location: [],
       updateId: null,
-      player: [[5, 4], [5, 5], [5, 6], [5, 7]], // player coordinates
-      listening: false
+      end: false,
+      player: [[5, 4], [5, 5], [5, 6], [5, 7]] // player coordinates
     };
   },
   methods: {
@@ -38,7 +42,6 @@ export default {
       this.generate_answer()
       this.player_location()
       window.addEventListener('keydown', this.move_player);
-      this.listening
       this.update_grid()
     },
 
@@ -117,15 +120,15 @@ export default {
       if (pressed.key === "Enter"){
         clearInterval(this.updateId);
         this.updateId = null;
-
+        window.removeEventListener('keydown', this.move_player);
         this.end_game()
       }
 
     },
 
     end_game(){
-
-      this.listening = false;
+      this.end = true
+      console.log(this.end)
       for (let i = 0; i < this.player.length; i++){
           if (this.nodes[this.player[i][0]][this.player[i][1]] !== this.answer[i]){
             console.log('lost')
@@ -135,6 +138,7 @@ export default {
       }
 
       console.log('win!')
+      
 
 
     },
@@ -143,7 +147,25 @@ export default {
     update_grid(){
       this.updateId = setInterval(() => {
         this.shift_grid();
+        this.update_answer_location();
+        console.log(this.answer_location[0])
       }, 2000);
+    },
+
+    update_answer_location(){
+      for (let i = 0; i < this.answer_location.length; i++){
+
+        if (this.answer_location[i][1] === 11 && this.answer_location[i][0] === 10){
+          this.answer_location[i][0] = 0
+          this.answer_location[i][1] = 0
+        } else if (this.answer_location[i][1] === 11){
+          this.answer_location[i][0]++
+          this.answer_location[i][1] = 0
+        } else {
+          this.answer_location[i][1]++
+        }
+        
+      }
     },
 
     // Generates a 10 x 11 grid of two combined uppercase letters and returns it
@@ -162,12 +184,14 @@ export default {
     // Generates a random answer from nodes array
     generate_answer(){
       this.answer = [];
+      this.answer_location = [];
 
       let row = Math.floor(Math.random() * 11);
       let col = Math.floor(Math.random() * 12);
 
       for (let i = 0; i < 4; i++){
         this.answer.push(this.nodes[row][col])
+        this.answer_location.push([row, col])
 
         if (col === 11 && row === 10){
           col, row = 0
@@ -204,12 +228,41 @@ export default {
 </script>
 <style scoped>
 
+  .win {
+    filter: blur(5px);
+  }
+
   .container {
     display: flex;
     justify-content: center;
   }
 
-  tr td, h2 {
+  .ontop {
+    position: relative;
+    text-align: center;
+    background-color: red;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  div .pause{
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none; /* clicks pass through */
+  }
+
+  /* h1 {
+    position: absolute;
+    inset: 0;         
+    z-index: 10;
+    justify-content: center;
+  } */
+
+  tr td, h2, h1 {
     font-family: monospace;
     font-size: xx-large;
     padding: 0.5rem;
