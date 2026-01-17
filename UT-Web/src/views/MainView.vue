@@ -6,12 +6,12 @@
     <table>
       <tbody>
         <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
-          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)">{{ value }}</td>
+          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)" :class="{answer: reveal_answer(rowIndex, colIndex)}" >{{ value }}</td>
         </tr>
     </tbody>
     </table>
     <!-- <div class="pause" v-if="end">
-      <h1>noku</h1>
+      <h1>fail</h1>
     </div> -->
   </div>
   <div class="container">
@@ -42,9 +42,23 @@ export default {
       this.generate_answer()
       this.player_location()
       window.addEventListener('keydown', this.move_player);
+      this.end = false;
       this.update_grid()
     },
 
+
+    // Finds and reveals the answer location in the grid
+    reveal_answer(row, col){
+      if (this.end === false){
+        return false
+      }
+
+      for (let i = 0; i < this.answer_location.length; i++){
+        if (this.answer_location[i][0] === row && this.answer_location[i][1] === col){
+          return true
+        }
+      }
+    },
 
     // Sets the player location visually in the grid
     player_location(element, row, col){
@@ -53,11 +67,17 @@ export default {
           return
       }
 
-      element.className = ''
+      element.classList.remove('player')
       
       for (let i = 0; i < this.player.length; i++){
+        // player location
         if (this.player[i][0] === row && this.player[i][1] === col){
           element.classList.add('player')
+        }
+
+        // correct answer location
+        if (this.answer_location[i][0] === row && this.answer_location[i][1] === col){
+
         }
 
       }
@@ -126,9 +146,11 @@ export default {
 
     },
 
+
+    // Ends the game and checks for win/loss
     end_game(){
       this.end = true
-      console.log(this.end)
+
       for (let i = 0; i < this.player.length; i++){
           if (this.nodes[this.player[i][0]][this.player[i][1]] !== this.answer[i]){
             console.log('lost')
@@ -139,8 +161,6 @@ export default {
 
       console.log('win!')
       
-
-
     },
 
     // Sets an interval for shifting the grid
@@ -152,6 +172,8 @@ export default {
       }, 2000);
     },
 
+
+    // Updates the answer location in the grid
     update_answer_location(){
       for (let i = 0; i < this.answer_location.length; i++){
 
@@ -261,6 +283,10 @@ export default {
     z-index: 10;
     justify-content: center;
   } */
+
+  .answer {
+    color: blue;
+  }
 
   tr td, h2, h1 {
     font-family: monospace;
