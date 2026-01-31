@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h2 v-for="node in answer">{{ node }}</h2>
+    <h2>{{ timer }}</h2>
   </div>
   <div class="container ontop">
     <table>
@@ -10,13 +11,15 @@
         </tr>
     </tbody>
     </table>
-    <!-- <div class="pause" v-if="end">
-      <h1>fail</h1>
-    </div> -->
+  </div>
+  <div class="pause" v-if="end">
+      <h1 v-if="!win">fail</h1>
+      <h1 v-else="win">win</h1>
   </div>
   <div class="container">
       <button @click="start()" @keydown.enter.prevent>Start</button>
   </div>
+  
 </template>
 
 <script>
@@ -26,23 +29,28 @@ export default {
       nodes: [],
       answer: [],
       answer_location: [],
-      updateId: null,
+      gameInterval: null,
+      timerInterval: null,
       end: false,
-      player: [[5, 4], [5, 5], [5, 6], [5, 7]] // player coordinates
+      win: false,
+      player: null,
+      timer: null
     };
   },
   methods: {
     // Start the game
     start(){
-      if (this.updateId) {
-        clearInterval(this.updateId);
-        this.updateId = null;
+      if (this.gameInterval) {
+        clearInterval(this.gameInterval);
+        this.gameInterval = null;
       }
+      this.player = [[5, 4], [5, 5], [5, 6], [5, 7]] // set player coordinates
       this.generate_nodes()
       this.generate_answer()
       this.player_location()
       window.addEventListener('keydown', this.move_player);
       this.end = false;
+      this.out_of_time()
       this.update_grid()
     },
 
@@ -138,8 +146,9 @@ export default {
       }
 
       if (pressed.key === "Enter"){
-        clearInterval(this.updateId);
-        this.updateId = null;
+        clearInterval(this.gameInterval);
+        clearInterval(this.timerInterval)
+        this.gameInterval = null;
         window.removeEventListener('keydown', this.move_player);
         this.end_game()
       }
@@ -158,14 +167,31 @@ export default {
           }
 
       }
-
+      this.win = true
       console.log('win!')
       
     },
 
+    out_of_time(){
+      this.timer = 6
+
+      this.timerInterval = setInterval(() => {
+        this.timer--
+        if (this.gameInterval && this.timer <= 0){
+          this.end = true
+          clearInterval(this.gameInterval)
+          this.gameInterval = null;
+          window.removeEventListener('keydown', this.move_player);
+          clearInterval(this.timerInterval)
+          this.timerInterval = null;
+        }
+      }, 1000);
+
+    },
+
     // Sets an interval for shifting the grid
     update_grid(){
-      this.updateId = setInterval(() => {
+      this.gameInterval = setInterval(() => {
         this.shift_grid();
         this.update_answer_location();
         console.log(this.answer_location[0])
@@ -261,8 +287,7 @@ export default {
 
   .ontop {
     position: relative;
-    text-align: center;
-    background-color: red;
+    text-align: center;  
   }
 
   table {
@@ -270,11 +295,11 @@ export default {
   }
 
   div .pause{
-    position: absolute;
-    inset: 0;
-    display: grid;
+    display: block;
+    width: 50%;
+    margin: auto;
     place-items: center;
-    pointer-events: none; /* clicks pass through */
+    background-color: rgb(150, 150, 150);
   }
 
   /* h1 {
