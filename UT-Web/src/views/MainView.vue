@@ -1,25 +1,26 @@
 <template>
-  <div class="container">
-    <h2 v-for="node in answer">{{ node }}</h2>
-    <h2>{{ timer }}</h2>
+  <div class="game">
+    <div class="container info">
+      <h2 class="find" v-for="node in answer">{{ node }}</h2>
+      <h2 class="time">{{ timer }}</h2>
+    </div>
+    <div class="container ontop">
+      <table>
+        <tbody>
+          <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
+            <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)" :class="{answer: reveal_answer(rowIndex, colIndex)}" >{{ value }}</td>
+          </tr>
+      </tbody>
+      </table>
+    </div>
+    <div class="pause" v-if="end">
+        <h1 v-if="!win">fail</h1>
+        <h1 v-else="win">win</h1>
+    </div>
+    <div class="container">
+        <button @click="start()" @keydown.enter.prevent class="btn">Start</button>
+    </div>
   </div>
-  <div class="container ontop">
-    <table>
-      <tbody>
-        <tr v-for="(node, rowIndex) in nodes" :key="rowIndex">
-          <td v-for="(value, colIndex) in node" :key="rowIndex - colIndex" :ref="element => player_location(element, rowIndex, colIndex)" :class="{answer: reveal_answer(rowIndex, colIndex)}" >{{ value }}</td>
-        </tr>
-    </tbody>
-    </table>
-  </div>
-  <div class="pause" v-if="end">
-      <h1 v-if="!win">fail</h1>
-      <h1 v-else="win">win</h1>
-  </div>
-  <div class="container">
-      <button @click="start()" @keydown.enter.prevent>Start</button>
-  </div>
-  
 </template>
 
 <script>
@@ -42,6 +43,8 @@ export default {
     start(){
       if (this.gameInterval) {
         clearInterval(this.gameInterval);
+        this.gameInterval = null;
+        clearInterval(this.timerInterval)
         this.gameInterval = null;
       }
       this.player = [[5, 4], [5, 5], [5, 6], [5, 7]] // set player coordinates
@@ -173,7 +176,7 @@ export default {
     },
 
     out_of_time(){
-      this.timer = 6
+      this.timer = 15
 
       this.timerInterval = setInterval(() => {
         this.timer--
@@ -276,8 +279,33 @@ export default {
 </script>
 <style scoped>
 
-  .win {
-    filter: blur(5px);
+.btn {
+    display:block;
+    font-size: xx-large;
+    border-radius:5px;
+    border: 1px solid rgb(0, 0, 0);
+    box-shadow: 2px 2px;
+    background-color: #4d6460;
+    font-family: monospace;
+    margin: 1rem;
+}
+
+.btn:hover {
+    background-color: #4c8d80;
+    cursor: pointer;
+}
+
+  div .info {
+    width: 50%;
+    margin: auto;
+  }
+
+  .game {
+    background-color: rgb(99, 91, 91);
+  }
+
+  .find {
+    color: blue;
   }
 
   .container {
@@ -292,6 +320,7 @@ export default {
 
   table {
     border-collapse: collapse;
+    background-color: rgb(59, 57, 57);
   }
 
   div .pause{
@@ -299,15 +328,7 @@ export default {
     width: 50%;
     margin: auto;
     place-items: center;
-    background-color: rgb(150, 150, 150);
   }
-
-  /* h1 {
-    position: absolute;
-    inset: 0;         
-    z-index: 10;
-    justify-content: center;
-  } */
 
   .answer {
     color: blue;
@@ -318,9 +339,7 @@ export default {
     font-size: xx-large;
     padding: 0.5rem;
   }
-  table {
-    background-color: rgb(150, 150, 150);
-  }
+
 
   .player {
     color: green;
