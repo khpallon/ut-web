@@ -1,8 +1,13 @@
 <template>
   <div class="game">
     <div class="container info">
+      <div class="find-area">
       <h2 class="find" v-for="node in answer">{{ node }}</h2>
-      <h2 class="time">{{ timer }}</h2>
+      </div>
+      <div class="stats-area">
+        <p class="stats">Time: {{ timer }}</p>
+        <p class="stats">Score: {{ points }}</p>
+      </div>
     </div>
     <div class="container ontop">
       <table>
@@ -35,7 +40,8 @@ export default {
       end: false,
       win: false,
       player: null,
-      timer: null
+      timer: null,
+      points: 0
     };
   },
   methods: {
@@ -175,6 +181,7 @@ export default {
       
     },
 
+    // Game timer
     out_of_time(){
       this.timer = 15
 
@@ -279,33 +286,51 @@ export default {
 </script>
 <style scoped>
 
+div.find-area{
+  background-color: rgb(59, 57, 57);
+  display: flex;
+  margin: auto;
+}
+
+div.stats-area{
+  margin: auto;
+  color: aliceblue;
+}
+
+.game {
+  background-color: rgb(99, 91, 91);
+  display: inline-block;
+  padding: 1rem;
+}
+
+
+p.stats{
+  font-family: monospace;
+  font-size: x-large;
+}
+
 .btn {
-    display:block;
-    font-size: xx-large;
-    border-radius:5px;
-    border: 1px solid rgb(0, 0, 0);
-    box-shadow: 2px 2px;
-    background-color: #4d6460;
-    font-family: monospace;
-    margin: 1rem;
+  display:block;
+  font-size: xx-large;
+  border-radius:5px;
+  border: 1px solid rgb(0, 0, 0);
+  box-shadow: 2px 2px;
+  background-color: #4d6460;
+  font-family: monospace;
+  margin: 1rem;
 }
 
 .btn:hover {
-    background-color: #4c8d80;
-    cursor: pointer;
+  background-color: #4c8d80;
+  cursor: pointer;
 }
 
-  div .info {
-    width: 50%;
-    margin: auto;
-  }
-
-  .game {
-    background-color: rgb(99, 91, 91);
+  div.info {
+    background-color: rgb(39, 38, 38);  
   }
 
   .find {
-    color: blue;
+    color: rgb(197, 129, 98);
   }
 
   .container {
@@ -323,7 +348,7 @@ export default {
     background-color: rgb(59, 57, 57);
   }
 
-  div .pause{
+  div.pause{
     display: block;
     width: 50%;
     margin: auto;
@@ -334,7 +359,7 @@ export default {
     color: blue;
   }
 
-  tr td, h2, h1 {
+  tr td, h1, h2 {
     font-family: monospace;
     font-size: xx-large;
     padding: 0.5rem;
